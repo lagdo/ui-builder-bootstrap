@@ -7,6 +7,8 @@ use Lagdo\UiBuilder\BuilderInterface;
 
 use function array_shift;
 use function func_get_args;
+use function rtrim;
+use function ltrim;
 
 class Builder extends AbstractBuilder
 {
@@ -395,6 +397,50 @@ class Builder extends AbstractBuilder
         $this->createScope('a', func_get_args());
         $this->prependClass('dropdown-item');
         $this->setAttributes(['href' => '#']);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function pagination(): BuilderInterface
+    {
+        $this->createWrapper('nav', ['aria-label' => '']);
+        $this->createScope('ul', func_get_args());
+        $this->prependClass('pagination');
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function paginationItem(): BuilderInterface
+    {
+        $this->createWrapper('li', ['class' => 'page-item']);
+        $this->createScope('a', func_get_args());
+        $this->prependClass('page-link');
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function paginationActiveItem(): BuilderInterface
+    {
+        $this->createWrapper('li', ['class' => 'page-item active']);
+        $this->createScope('a', func_get_args());
+        $this->prependClass('page-link');
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function paginationDisabledItem(): BuilderInterface
+    {
+        $this->createWrapper('li', ['class' => 'disabled']);
+        $this->createScope('span', func_get_args());
+        $this->prependClass('page-link');
         return $this;
     }
 }
