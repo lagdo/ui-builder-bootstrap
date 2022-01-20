@@ -1,8 +1,14 @@
 <?php
 
-namespace Lagdo\UiBuilder\Bootstrap;
+namespace Lagdo\UiBuilder\Bootstrap\Bootstrap3;
 
-class Bootstrap4Builder extends AbstractBuilder
+use Lagdo\UiBuilder\AbstractBuilder;
+use Lagdo\UiBuilder\BuilderInterface;
+
+use function array_shift;
+use function func_get_args;
+
+class Builder extends AbstractBuilder
 {
     /**
      * @inheritDoc
@@ -10,9 +16,25 @@ class Bootstrap4Builder extends AbstractBuilder
     protected function getFormElementClass(string $tagName): string
     {
         if ($tagName === 'label') {
-            return 'col-form-label';
+            return 'control-label';
         }
         return 'form-control';
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addIcon(string $icon): BuilderInterface
+    {
+        return $this->addHtml('<span class="glyphicon glyphicon-' . $icon . '" aria-hidden="true" />');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addCaret(): BuilderInterface
+    {
+        return $this->addHtml('<span class="caret" />');
     }
 
     /**
@@ -21,8 +43,10 @@ class Bootstrap4Builder extends AbstractBuilder
     public function checkbox(bool $checked = false): BuilderInterface
     {
         if ($this->scope !== null && $this->scope->isInputGroup) {
-            $this->createWrapper('div', ['class' => 'input-group-append']);
-            $this->createWrapper('div', ['class' => 'input-group-text', 'style' => 'background-color:white;']);
+            $this->createWrapper('span', [
+                'class' => 'input-group-addon',
+                'style' => 'background-color:white;padding:8px;',
+            ]);
         }
         $arguments = func_get_args();
         return parent::checkbox(...$arguments);
@@ -31,13 +55,23 @@ class Bootstrap4Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
+    public function text(): BuilderInterface
+    {
+        // A label in an input group must be wrapped into a span with class "input-group-addon".
+        if ($this->scope !== null && $this->scope->isInputGroup) {
+            $this->createWrapper('span', ['class' => 'input-group-addon']);
+        }
+        $this->createScope('span', func_get_args());
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function row(): BuilderInterface
     {
-        $attributes = [
-            'class' => rtrim('row ' . ltrim($class)),
-        ];
         $this->createScope('div', func_get_args());
-        $this->prependClass('');
+        $this->prependClass('row');
         return $this;
     }
 
@@ -49,11 +83,10 @@ class Bootstrap4Builder extends AbstractBuilder
         if ($width < 1 || $width > 12) {
             $width = 12; // Full width by default.
         }
-        $attributes = [
-            'class' => rtrim("col-md-$width "  . ltrim($class)),
-        ];
-        $this->createScope('div', func_get_args());
-        $this->prependClass('');
+        $arguments = func_get_args();
+        array_shift($arguments);
+        $this->createScope('div', $arguments);
+        $this->prependClass("col-md-$width");
         return $this;
     }
 
@@ -62,54 +95,9 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function inputGroup(): BuilderInterface
     {
-        $attributes = [
-            'class' => rtrim('input-group ' . ltrim($class)),
-        ];
         $this->createScope('div', func_get_args());
-        $this->prependClass('');
+        $this->prependClass('input-group');
         $this->scope->isInputGroup = true;
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function text(): BuilderInterface
-    {
-        // A label in an input group must be wrapped into a span with class "input-group-addon".
-        // Check the parent scope.
-        if ($this->scope !== null && $this->scope->isInputGroup) {
-            $this->createWrapper('div', ['class' => 'input-group-prepend']);
-            // Set the element class
-            $class = rtrim('input-group-text ' . ltrim($class));
-        }
-        $attributes = ['class' => $class];
-        $this->createScope('label', func_get_args());
-        $this->prependClass('');
-        return $this;
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addIcon(string $icon): BuilderInterface
-    {
-        if ($icon === 'remove') {
-            $icon = 'x';
-        } elseif ($icon === 'edit') {
-            $icon = 'pencil';
-        } elseif ($icon === 'ok') {
-            $icon = 'check';
-        }
-        return $this->addHtml('<i class="bi bi-' . $icon . '"></i>');
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function addCaret(): BuilderInterface
-    {
-        // Nothing to do.
         return $this;
     }
 
@@ -118,9 +106,11 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function buttonGroup(bool $fullWidth): BuilderInterface
     {
-        $this->createScope('div', func_get_args());
-        $this->prependClass($fullWidth ? 'btn-group d-flex' : 'btn-group');
-        $this->setAttributes(['role' => 'group']);
+        $arguments = func_get_args();
+        array_shift($arguments);
+        $this->createScope('div', $arguments);
+        $this->prependClass($fullWidth ? 'btn-group btn-group-justified' : 'btn-group');
+        $this->setAttributes(['role' => 'group','aria-label' => '...']);
         $this->scope->isButtonGroup = true;
         return $this;
     }
@@ -135,25 +125,30 @@ class Bootstrap4Builder extends AbstractBuilder
         $isInButtonGroup = false;
         if ($this->scope !== null) {
             if ($this->scope->isInputGroup) {
-                $this->createWrapper('div', ['class' => 'input-group-append']);
+                $this->createWrapper('div', ['class' => 'input-group-btn']);
             }
-            $isInButtonGroup = $this->scope->isButtonGroup;
+            if ($this->scope->isButtonGroup && $flags & self::BTN_FULL_WIDTH) {
+                $this->createWrapper('div', ['class' => 'btn-group', 'role' => 'group']);
+                $isInButtonGroup = true;
+            }
         }
-        $style = 'secondary'; // The default style is "secondary"
+        $style = 'default';
         if ($flags & self::BTN_PRIMARY) {
             $style = 'primary';
         }
         if ($flags & self::BTN_DANGER) {
             $style = 'danger';
         }
-        $btnClass = ($flags & self::BTN_OUTLINE) ? "btn btn-outline-$style " : "btn btn-$style ";
+        $btnClass = "btn btn-$style";
         if (($flags & self::BTN_FULL_WIDTH) && !$isInButtonGroup) {
-            $btnClass .= 'w-100 ';
+            $btnClass .= ' btn-block';
         }
         if ($flags & self::BTN_SMALL) {
-            $btnClass .= 'btn-sm ';
+            $btnClass .= ' btn-sm';
         }
-        $this->createScope('button', func_get_args());
+        $arguments = func_get_args();
+        array_shift($arguments);
+        $this->createScope('button', $arguments);
         $this->prependClass($btnClass);
         $this->setAttributes(['type' => 'button']);
         return $this;
@@ -164,9 +159,10 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function panel(string $style = 'default'): BuilderInterface
     {
-        $this->options['card-style'] = $style;
-        $this->createScope('div', func_get_args());
-        $this->prependClass("card border-$style w-100");
+        $arguments = func_get_args();
+        array_shift($arguments);
+        $this->createScope('div', $arguments);
+        $this->prependClass("panel panel-$style");
         return $this;
     }
 
@@ -175,9 +171,8 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function panelHeader(): BuilderInterface
     {
-        $style = $this->options['card-style'];
         $this->createScope('div', func_get_args());
-        $this->prependClass("card-header border-$style");
+        $this->prependClass('panel-heading');
         return $this;
     }
 
@@ -186,9 +181,8 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function panelBody(): BuilderInterface
     {
-        $style = $this->options['card-style'];
         $this->createScope('div', func_get_args());
-        $this->prependClass("card-body text-$style");
+        $this->prependClass('panel-body');
         return $this;
     }
 
@@ -197,9 +191,8 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function panelFooter(): BuilderInterface
     {
-        $style = $this->options['card-style'];
         $this->createScope('div', func_get_args());
-        $this->prependClass("card-footer border-$style");
+        $this->prependClass('panel-footer');
         return $this;
     }
 
@@ -216,10 +209,10 @@ class Bootstrap4Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
-    public function menuItem(string $title): BuilderInterface
+    public function menuItem(): BuilderInterface
     {
-        $this->createScope('a', $title, func_get_args());
-        $this->prependClass('list-group-item list-group-item-action');
+        $this->createScope('a', func_get_args());
+        $this->prependClass('list-group-item');
         $this->setAttributes(['href' => 'javascript:void(0)']);
         return $this;
     }
@@ -229,7 +222,6 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function breadcrumb(): BuilderInterface
     {
-        $this->createWrapper('nav', ['aria-label' => 'breadcrumb']);
         $this->createScope('ol', func_get_args());
         $this->prependClass('breadcrumb');
         return $this;
@@ -241,7 +233,7 @@ class Bootstrap4Builder extends AbstractBuilder
     public function breadcrumbItem(): BuilderInterface
     {
         $this->createScope('li', func_get_args());
-        $this->prependClass('breadcrumb-item');
+        $this->prependClass('active');
         return $this;
     }
 
@@ -258,17 +250,18 @@ class Bootstrap4Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
-    public function tabHeaderItem(string $id, bool $active): BuilderInterface
+    public function tabHeaderItem(string $id, bool $active = false): BuilderInterface
     {
         $arguments = func_get_args();
         array_shift($arguments);
         array_shift($arguments);
         $this->createScope('li', $arguments);
-        $this->prependClass('nav-item');
+        if ($active) {
+            $this->appendClass('active');
+        }
         $this->setAttributes(['role' => 'presentation']);
         // Inner link
-        $this->createScope('a', [['class' => $active ? 'nav-link active' : 'nav-link',
-            'data-toggle' => 'tab', 'role' => 'tab', 'href' => "#$id"]]);
+        $this->createScope('a', [['data-toggle' => 'pill', 'href' => "#$id"]]);
         $this->end();
         return $this;
     }
@@ -287,13 +280,13 @@ class Bootstrap4Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
-    public function tabContentItem(string $id, bool $active): BuilderInterface
+    public function tabContentItem(string $id, bool $active = false): BuilderInterface
     {
         $arguments = func_get_args();
         array_shift($arguments);
         array_shift($arguments);
         $this->createScope('div', $arguments);
-        $this->prependClass($active ? 'tab-pane fade show active' : 'tab-pane fade');
+        $this->prependClass($active ? 'tab-pane fade in active' : 'tab-pane fade in');
         $this->setAttributes(['id' => $id]);
         return $this;
     }
@@ -306,7 +299,10 @@ class Bootstrap4Builder extends AbstractBuilder
         if ($responsive) {
             $this->createWrapper('div', ['class' => 'table-responsive']);
         }
-        $this->createScope('table', func_get_args());
+        $arguments = func_get_args();
+        array_shift($arguments);
+        array_shift($arguments);
+        $this->createScope('table', $arguments);
         $this->prependClass($style ? "table table-$style" : 'table');
         return $this;
     }
@@ -314,12 +310,18 @@ class Bootstrap4Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
-    public function form(bool $horizontal, bool $wrapped = true): BuilderInterface
+    public function form(bool $horizontal = false, bool $wrapped = false): BuilderInterface
     {
         if ($wrapped) {
             $this->createWrapper('div', ['class' => 'portlet-body form']);
         }
-        $this->createScope('form', func_get_args());
+        $arguments = func_get_args();
+        array_shift($arguments);
+        array_shift($arguments);
+        $this->createScope('form', $arguments);
+        if ($horizontal) {
+            $this->prependClass('form-horizontal');
+        }
         return $this;
     }
 
@@ -329,7 +331,7 @@ class Bootstrap4Builder extends AbstractBuilder
     public function formRow(): BuilderInterface
     {
         $this->createScope('div', func_get_args());
-        $this->prependClass('form-group row');
+        $this->prependClass('form-group');
         return $this;
     }
 
@@ -338,7 +340,7 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function formRowClass(string $class = ''): string
     {
-        return rtrim('form-group row ' . ltrim($class));
+        return rtrim('form-group ' . ltrim($class));
     }
 
     /**
@@ -357,7 +359,9 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function dropdownItem(string $style = 'default'): BuilderInterface
     {
-        $this->createScope('button', func_get_args());
+        $arguments = func_get_args();
+        array_shift($arguments);
+        $this->createScope('button', $arguments);
         $this->prependClass("btn btn-$style dropdown-toggle");
         $this->setAttributes(['data-toggle' => 'dropdown', 'aria-haspopup' => 'true', 'aria-expanded' => 'false']);
         return $this;
@@ -368,7 +372,7 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function dropdownMenu(): BuilderInterface
     {
-        $this->createScope('div', func_get_args());
+        $this->createScope('ul', func_get_args());
         $this->prependClass('dropdown-menu');
         return $this;
     }
@@ -378,8 +382,8 @@ class Bootstrap4Builder extends AbstractBuilder
      */
     public function dropdownMenuItem(): BuilderInterface
     {
+        $this->createWrapper('li');
         $this->createScope('a', func_get_args());
-        $this->prependClass('dropdown-item');
         $this->setAttributes(['href' => '#']);
         return $this;
     }
