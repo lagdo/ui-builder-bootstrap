@@ -129,7 +129,7 @@ class Builder extends AbstractBuilder
             if ($this->scope->isInputGroup) {
                 $this->createWrapper('div', ['class' => 'input-group-btn']);
             }
-            if ($this->scope->isButtonGroup && $flags & self::BTN_FULL_WIDTH) {
+            if ($this->scope->isButtonGroup && ($flags & self::BTN_FULL_WIDTH)) {
                 $this->createWrapper('div', ['class' => 'btn-group', 'role' => 'group']);
                 $isInButtonGroup = true;
             }
