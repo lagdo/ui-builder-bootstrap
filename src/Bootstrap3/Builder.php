@@ -15,17 +15,6 @@ class Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
-    protected function getFormElementClass(string $tagName): string
-    {
-        if ($tagName === 'label') {
-            return 'control-label';
-        }
-        return 'form-control';
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function addIcon(string $icon): BuilderInterface
     {
         return $this->addHtml('<span class="glyphicon glyphicon-' . $icon . '" aria-hidden="true" />');
@@ -343,6 +332,17 @@ class Builder extends AbstractBuilder
     public function formRowClass(string $class = ''): string
     {
         return rtrim('form-group ' . ltrim($class));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function _formTagClass(string $tagName): string
+    {
+        if ($tagName === 'label') {
+            return 'control-label';
+        }
+        return 'form-control';
     }
 
     /**

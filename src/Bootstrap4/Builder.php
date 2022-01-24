@@ -15,17 +15,6 @@ class Builder extends AbstractBuilder
     /**
      * @inheritDoc
      */
-    protected function getFormElementClass(string $tagName): string
-    {
-        if ($tagName === 'label') {
-            return 'col-form-label';
-        }
-        return 'form-control';
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function addIcon(string $icon): BuilderInterface
     {
         if ($icon === 'remove') {
@@ -353,6 +342,17 @@ class Builder extends AbstractBuilder
     public function formRowClass(string $class = ''): string
     {
         return rtrim('form-group row ' . ltrim($class));
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function _formTagClass(string $tagName): string
+    {
+        if ($tagName === 'label') {
+            return 'col-form-label';
+        }
+        return 'form-control';
     }
 
     /**
