@@ -5,7 +5,8 @@ This package extends the [HTML UI builder](https://github.com/lagdo/ui-builder) 
 ### Usage
 
 See the [HTML UI builder](https://github.com/lagdo/ui-builder) documentation.
-Depending on the Bootstrap version the HTML code, a different class instance must provided where the `Lagdo\UiBuilder\BuilderInterface` is required.
+
+Depending on the version of Bootstrap, a different class instance must provided where the `Lagdo\UiBuilder\BuilderInterface` is required.
 
 For example, let say this `View` class is used to create HTML code.
 ```php
@@ -28,14 +29,14 @@ class View
 }
 ```
 
-The following code will generate HTML code for Bootstrap 3.
+With the following example, the `View` class will generate HTML code for Bootstrap 3.
 ```php
 use Lagdo\UiBuilder\Bootstrap\Bootstrap3\Builder;
 
 $view = new View(new Builder());
 ```
 
-And the following code will generate HTML code for Bootstrap 4.
+And with the following example, the `View` class will generate HTML code for Bootstrap 4.
 ```php
 use Lagdo\UiBuilder\Bootstrap\Bootstrap4\Builder;
 
