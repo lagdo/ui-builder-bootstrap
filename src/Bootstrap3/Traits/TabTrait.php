@@ -39,7 +39,7 @@ trait TabTrait
         array_shift($arguments);
         $this->createScope('li', $arguments);
         if ($active) {
-            $this->appendClass('active');
+            $this->prependClass('active');
         }
         $this->setAttributes(['role' => 'presentation']);
         // Inner link
