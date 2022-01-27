@@ -13,6 +13,15 @@ use function ltrim;
 class Builder extends AbstractBuilder
 {
     /**
+     * @var array
+     */
+    protected $buttonStyles = [
+        0 => 'default',
+        self::BTN_PRIMARY => 'primary',
+        self::BTN_DANGER => 'danger',
+    ];
+
+    /**
      * @inheritDoc
      */
     public function addIcon(string $icon): BuilderInterface
@@ -107,6 +116,31 @@ class Builder extends AbstractBuilder
     }
 
     /**
+     * @param integer $flags
+     * @param boolean $isInButtonGroup
+     *
+     * @return string
+     */
+    private function buttonClass(int $flags, bool $isInButtonGroup): string
+    {
+        $style = 'default';
+        foreach ($this->buttonStyles as $mask => $value) {
+            if ($flags & $mask) {
+                $style = $value;
+                break;
+            }
+        }
+        $btnClass = "btn btn-$style";
+        if (($flags & self::BTN_FULL_WIDTH) && !$isInButtonGroup) {
+            $btnClass .= ' btn-block';
+        }
+        if ($flags & self::BTN_SMALL) {
+            $btnClass .= ' btn-sm';
+        }
+        return $btnClass;
+    }
+
+    /**
      * @inheritDoc
      */
     public function button(int $flags = 0): BuilderInterface
@@ -123,24 +157,10 @@ class Builder extends AbstractBuilder
                 $isInButtonGroup = true;
             }
         }
-        $style = 'default';
-        if ($flags & self::BTN_PRIMARY) {
-            $style = 'primary';
-        }
-        if ($flags & self::BTN_DANGER) {
-            $style = 'danger';
-        }
-        $btnClass = "btn btn-$style";
-        if (($flags & self::BTN_FULL_WIDTH) && !$isInButtonGroup) {
-            $btnClass .= ' btn-block';
-        }
-        if ($flags & self::BTN_SMALL) {
-            $btnClass .= ' btn-sm';
-        }
         $arguments = func_get_args();
         array_shift($arguments);
         $this->createScope('button', $arguments);
-        $this->prependClass($btnClass);
+        $this->prependClass($this->buttonClass($flags, $isInButtonGroup));
         $this->setAttributes(['type' => 'button']);
         return $this;
     }
