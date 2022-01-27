@@ -1,4 +1,12 @@
-## A Bootstrap extension for the HTML UI builder
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/lagdo/ui-builder-bootstrap/badges/quality-score.png?b=main)](https://scrutinizer-ci.com/g/lagdo/ui-builder-bootstrap/?branch=main)
+[![StyleCI](https://styleci.io/repos/449480114/shield?branch=main)](https://styleci.io/repos/449480114)
+
+[![Latest Stable Version](https://poser.pugx.org/lagdo/ui-builder-bootstrap/v/stable)](https://packagist.org/packages/lagdo/ui-builder-bootstrap)
+[![Total Downloads](https://poser.pugx.org/lagdo/ui-builder-bootstrap/downloads)](https://packagist.org/packages/lagdo/ui-builder-bootstrap)
+[![License](https://poser.pugx.org/lagdo/ui-builder-bootstrap/license)](https://packagist.org/packages/lagdo/ui-builder-bootstrap)
+
+Bootstrap extensions for the HTML UI builder
+============================================
 
 This package extends the [HTML UI builder](https://github.com/lagdo/ui-builder) and implements functions to create UI components for Bootstrap 3 and 4.
 
