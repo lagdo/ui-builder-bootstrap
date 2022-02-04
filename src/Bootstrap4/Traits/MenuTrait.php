@@ -43,6 +43,28 @@ trait MenuTrait
     /**
      * @inheritDoc
      */
+    public function menuActiveItem(): BuilderInterface
+    {
+        $this->createScope('a', func_get_args());
+        $this->prependClass('list-group-item list-group-item-action active');
+        $this->setAttributes(['href' => 'javascript:void(0)']);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function menuDisabledItem(): BuilderInterface
+    {
+        $this->createScope('a', func_get_args());
+        $this->prependClass('list-group-item list-group-item-action disabled');
+        $this->setAttributes(['href' => 'javascript:void(0)']);
+        return $this;
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function breadcrumb(): BuilderInterface
     {
         $this->createWrapper('nav', ['aria-label' => 'breadcrumb']);
@@ -54,10 +76,12 @@ trait MenuTrait
     /**
      * @inheritDoc
      */
-    public function breadcrumbItem(): BuilderInterface
+    public function breadcrumbItem(bool $active): BuilderInterface
     {
-        $this->createScope('li', func_get_args());
-        $this->prependClass('breadcrumb-item');
+        $arguments = func_get_args();
+        array_shift($arguments);
+        $this->createScope('li', $arguments);
+        $this->prependClass($active ? 'breadcrumb-item active' : 'breadcrumb-item');
         return $this;
     }
 
