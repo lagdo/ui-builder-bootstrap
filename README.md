@@ -8,7 +8,7 @@
 Bootstrap extensions for the HTML UI builder
 ============================================
 
-This package extends the [HTML UI builder](https://github.com/lagdo/ui-builder) and implements functions to create UI components for Bootstrap 3 and 4.
+This package extends the [HTML UI builder](https://github.com/lagdo/ui-builder) and implements functions to create UI components for Bootstrap 3, 4 and 5.
 
 ### Usage
 
