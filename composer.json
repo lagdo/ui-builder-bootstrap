@@ -16,7 +16,7 @@
         "source": "https://github.com/lagdo/ui-builder-bootstrap"
     },
     "require": {
-        "lagdo/ui-builder": "^0.1"
+        "lagdo/ui-builder": "0.1.*"
     },
     "autoload": {
         "psr-4": {
