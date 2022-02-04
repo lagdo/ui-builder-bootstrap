@@ -22,28 +22,28 @@ trait TabTrait
     /**
      * @inheritDoc
      */
-    public function tabHeader(): BuilderInterface
+    public function tabNav(string $id = ''): BuilderInterface
     {
         $this->createScope('ul', func_get_args());
         $this->prependClass('nav nav-pills');
+        if (($id)) {
+            $this->setAttributes(['id' => $id]);
+        }
         return $this;
     }
 
     /**
      * @inheritDoc
      */
-    public function tabHeaderItem(string $id, bool $active = false): BuilderInterface
+    public function tabNavItem(string $target, bool $active = false): BuilderInterface
     {
         $arguments = func_get_args();
         array_shift($arguments);
         array_shift($arguments);
-        $this->createScope('li', $arguments);
-        $this->prependClass('nav-item');
-        $this->setAttributes(['role' => 'presentation']);
-        // Inner link
-        $this->createScope('a', [['class' => $active ? 'nav-link active' : 'nav-link',
-            'data-toggle' => 'tab', 'role' => 'tab', 'href' => "#$id"]]);
-        $this->end();
+        $this->createWrapper('li', ['class' => 'nav-item', 'role' => 'presentation']);
+        $this->createScope('a', $arguments);
+        $this->prependClass($active ? 'nav-link active' : 'nav-link');
+        $this->setAttributes(['data-toggle' => 'tab', 'role' => 'tab', 'href' => "#$target"]);
         return $this;
     }
 

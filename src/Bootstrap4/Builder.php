@@ -62,10 +62,9 @@ class Builder extends AbstractBuilder
     {
         // A label in an input group must be wrapped into a span with class "input-group-addon".
         // Check the parent scope.
-        $isInGroup = false;
-        if ($this->scope !== null && $this->scope->isInputGroup) {
+        $isInGroup = ($this->scope !== null && $this->scope->isInputGroup);
+        if ($isInGroup) {
             $this->createWrapper('div', ['class' => 'input-group-prepend']);
-            $isInGroup = true;
         }
         $this->createScope('label', func_get_args());
         if ($isInGroup) {

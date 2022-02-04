@@ -67,12 +67,12 @@ trait ButtonTrait
     private function buttonClass(int $flags, bool $isInButtonGroup): string
     {
         $style = $this->buttonStyle($flags);
-        $btnClass = ($flags & AbstractBuilder::BTN_OUTLINE) ? "btn btn-outline-$style " : "btn btn-$style ";
+        $btnClass = ($flags & AbstractBuilder::BTN_OUTLINE) ? "btn btn-outline-$style" : "btn btn-$style";
         if (($flags & AbstractBuilder::BTN_FULL_WIDTH) && !$isInButtonGroup) {
-            $btnClass .= 'w-100 ';
+            $btnClass .= ' w-100';
         }
         if ($flags & AbstractBuilder::BTN_SMALL) {
-            $btnClass .= 'btn-sm ';
+            $btnClass .= ' btn-sm';
         }
         return $btnClass;
     }
