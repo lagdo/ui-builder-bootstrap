@@ -1,7 +1,7 @@
 <?php
 
-if (function_exists('jaxon')) {
-    $di = jaxon()->di();
+if (function_exists('Jaxon\jaxon')) {
+    $di = Jaxon\jaxon()->di();
     // Register the UI builders
     $di->auto(Lagdo\UiBuilder\Bootstrap\Bootstrap3\Builder::class);
     $di->alias('dbadmin_builder_bootstrap3', Lagdo\UiBuilder\Bootstrap\Bootstrap3\Builder::class);
